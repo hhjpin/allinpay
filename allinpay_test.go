@@ -11,6 +11,7 @@ func TestPay_Request(t *testing.T) {
 		PrivateFile: os.Getenv("AllinpayPrivateFile"),
 		PublicFile:  os.Getenv("AllinpayPublicFile"),
 		Sysid:       os.Getenv("AllinpaySysid"),
+		IsDebug:     true,
 	})
 	if err != nil {
 		t.Fatal(err)

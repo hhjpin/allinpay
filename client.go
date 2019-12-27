@@ -63,6 +63,9 @@ func (c *Client) doGet(req *Request) ([]byte, error) {
 	reqBytes, _ := json.Marshal(req.Req)
 	uri := fmt.Sprintf("%s?sysid=%s&v=%s&timestamp=%s&req=%s&sign=%s&", req.Config.RequestUrl, req.Sysid, req.V,
 		EncodeURIComponent(req.Timestamp), EncodeURIComponent(string(reqBytes)), EncodeURIComponent(req.Sign))
+	if req.Config.IsDebug {
+		logger.Debug("[allinpay request]:", uri)
+	}
 	resp, err := http.Get(uri)
 	if err != nil {
 		return nil, err
@@ -74,6 +77,9 @@ func (c *Client) doGet(req *Request) ([]byte, error) {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+	if req.Config.IsDebug {
+		logger.Debug("[allinpay response]:", string(body))
 	}
 	return body, nil
 }

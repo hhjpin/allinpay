@@ -18,6 +18,8 @@ type Config struct {
 
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey
+
+	IsDebug bool
 }
 
 func (c *Config) init() error {
