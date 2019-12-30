@@ -27,3 +27,7 @@ func (p *Pay) RequestAndCheckStatus(service, method string, param map[string]int
 	}
 	return resp, resp.CheckStatus()
 }
+
+func (p *Pay) GetConfig() *Config {
+	return p.config
+}
