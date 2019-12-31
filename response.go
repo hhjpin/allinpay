@@ -14,7 +14,7 @@ type Response struct {
 
 func (r *Response) CheckStatus() error {
 	if r.Status != "OK" {
-		return fmt.Errorf("allinpay return error:%s:%s", r.ErrorCode, r.Message)
+		return fmt.Errorf("%s(%s)", r.Message, r.ErrorCode)
 	}
 	return nil
 }

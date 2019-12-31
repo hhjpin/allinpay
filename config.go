@@ -13,14 +13,12 @@ import (
 	"encoding/pem"
 	"fmt"
 	"github.com/hhjpin/goutils/logger"
-	"io/ioutil"
-	"os"
 )
 
 type Config struct {
 	RequestUrl  string //请求地址
-	PrivateFile string //私钥文件
-	PublicFile  string //公钥文件
+	PrivateData []byte //私钥数据
+	PublicData  []byte //公钥数据
 	Sysid       string //系统id
 
 	privateKey *rsa.PrivateKey
@@ -40,24 +38,10 @@ func (c *Config) init() error {
 }
 
 func (c *Config) initPrivateKey() error {
-	if c.PrivateFile == "" {
-		return fmt.Errorf("私钥文件必须指定")
+	if len(c.PrivateData) == 0 {
+		return fmt.Errorf("私钥数据不能为空")
 	}
-	priFile, err := os.Open(c.PrivateFile)
-	if err != nil {
-		logger.Error(err)
-		return err
-	}
-	defer func() {
-		_ = priFile.Close()
-	}()
-	privateData, err := ioutil.ReadAll(priFile)
-	if err != nil {
-		logger.Error(err)
-		return err
-	}
-
-	block, _ := pem.Decode(privateData)
+	block, _ := pem.Decode(c.PrivateData)
 	if block == nil {
 		logger.Error("sign pem.Decode error")
 		return fmt.Errorf("sign pem.Decode error")
@@ -79,25 +63,10 @@ func (c *Config) initPrivateKey() error {
 }
 
 func (c *Config) initPublicKey() error {
-	if c.PublicFile == "" {
-		return fmt.Errorf("公钥文件必须指定")
+	if len(c.PublicData) == 0 {
+		return fmt.Errorf("公钥数据不能为空")
 	}
-
-	pubFile, err := os.Open(c.PublicFile)
-	if err != nil {
-		logger.Error(err)
-		return err
-	}
-	defer func() {
-		_ = pubFile.Close()
-	}()
-	publicData, err := ioutil.ReadAll(pubFile)
-	if err != nil {
-		logger.Error(err)
-		return err
-	}
-
-	block, _ := pem.Decode(publicData)
+	block, _ := pem.Decode(c.PublicData)
 	if block == nil {
 		logger.Error("verify pem.Decode error")
 		return fmt.Errorf("verify pem.Decode error")

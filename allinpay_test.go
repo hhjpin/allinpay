@@ -1,21 +1,48 @@
 package allinpay
 
 import (
+	"io/ioutil"
 	"os"
 	"testing"
 )
 
-func TestPay_Request(t *testing.T) {
+func NewPay() *Pay {
+	privateFile := os.Getenv("AllinpayPrivateFile")
+	priFile, err := os.Open(privateFile)
+	if err != nil {
+		panic(err)
+	}
+	defer priFile.Close()
+	privateData, err := ioutil.ReadAll(priFile)
+	if err != nil {
+		panic(err)
+	}
+	publicFile := os.Getenv("AllinpayPublicFile")
+	pubFile, err := os.Open(publicFile)
+	if err != nil {
+		panic(err)
+	}
+	defer priFile.Close()
+	publicData, err := ioutil.ReadAll(pubFile)
+	if err != nil {
+		panic(err)
+	}
+
 	pay, err := New(&Config{
 		RequestUrl:  os.Getenv("AllinpayRequestUrl"),
-		PrivateFile: os.Getenv("AllinpayPrivateFile"),
-		PublicFile:  os.Getenv("AllinpayPublicFile"),
+		PrivateData: privateData,
+		PublicData:  publicData,
 		Sysid:       os.Getenv("AllinpaySysid"),
 		IsDebug:     true,
 	})
 	if err != nil {
-		t.Fatal(err)
+		panic(err)
 	}
+	return pay
+}
+
+func TestPay_Request(t *testing.T) {
+	pay := NewPay()
 	resp, err := pay.Request("MemberService", "createMember", map[string]interface{}{
 		"bizUserId":  "test_user_1",
 		"memberType": 3,
@@ -36,16 +63,7 @@ func TestPay_Request(t *testing.T) {
 }
 
 func TestMemberServiceSetRealName(t *testing.T) {
-	pay, err := New(&Config{
-		RequestUrl:  os.Getenv("AllinpayRequestUrl"),
-		PrivateFile: os.Getenv("AllinpayPrivateFile"),
-		PublicFile:  os.Getenv("AllinpayPublicFile"),
-		Sysid:       os.Getenv("AllinpaySysid"),
-		IsDebug:     true,
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
+	pay := NewPay()
 	no, err := pay.GetConfig().Encrypt([]byte("111111111111111111"))
 	if err != nil {
 		t.Fatal(err)

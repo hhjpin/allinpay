@@ -38,7 +38,7 @@ func (c *Client) doGet(req *Request) ([]byte, error) {
 	uri := fmt.Sprintf("%s?sysid=%s&v=%s&timestamp=%s&req=%s&sign=%s&", req.Config.RequestUrl, req.Sysid, req.V,
 		EncodeURIComponent(req.Timestamp), EncodeURIComponent(string(reqBytes)), EncodeURIComponent(req.Sign))
 	if req.Config.IsDebug {
-		logger.Debug("[allinpay request]:", uri)
+		logger.Info("[allinpay request]:", uri)
 	}
 	resp, err := http.Get(uri)
 	if err != nil {
@@ -53,7 +53,7 @@ func (c *Client) doGet(req *Request) ([]byte, error) {
 		return nil, err
 	}
 	if req.Config.IsDebug {
-		logger.Debug("[allinpay response]:", string(body))
+		logger.Info("[allinpay response]:", string(body))
 	}
 	return body, nil
 }
