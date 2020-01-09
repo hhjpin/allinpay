@@ -16,10 +16,11 @@ func NewClient() *Client {
 }
 
 func (c *Client) Get(req *Request) (*Response, error) {
-	if err := c.sign(req); err != nil {
+	param, err := c.CreateUriParam(req)
+	if err != nil {
 		return nil, err
 	}
-	body, err := c.doGet(req)
+	body, err := c.doGet(req.Config.RequestUrl+param, req.Config.IsDebug)
 	if err != nil {
 		return nil, err
 	}
@@ -33,11 +34,8 @@ func (c *Client) Get(req *Request) (*Response, error) {
 	return &resp, nil
 }
 
-func (c *Client) doGet(req *Request) ([]byte, error) {
-	reqBytes, _ := json.Marshal(req.Req)
-	uri := fmt.Sprintf("%s?sysid=%s&v=%s&timestamp=%s&req=%s&sign=%s&", req.Config.RequestUrl, req.Sysid, req.V,
-		EncodeURIComponent(req.Timestamp), EncodeURIComponent(string(reqBytes)), EncodeURIComponent(req.Sign))
-	if req.Config.IsDebug {
+func (c *Client) doGet(uri string, debug bool) ([]byte, error) {
+	if debug {
 		logger.Info("[allinpay request]:", uri)
 	}
 	resp, err := http.Get(uri)
@@ -52,10 +50,20 @@ func (c *Client) doGet(req *Request) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	if req.Config.IsDebug {
+	if debug {
 		logger.Info("[allinpay response]:", string(body))
 	}
 	return body, nil
+}
+
+func (c *Client) CreateUriParam(req *Request) (string, error) {
+	if err := c.sign(req); err != nil {
+		return "", err
+	}
+	reqBytes, _ := json.Marshal(req.Req)
+	param := fmt.Sprintf("?sysid=%s&v=%s&timestamp=%s&req=%s&sign=%s&", req.Sysid, req.V,
+		EncodeURIComponent(req.Timestamp), EncodeURIComponent(string(reqBytes)), EncodeURIComponent(req.Sign))
+	return param, nil
 }
 
 func (c *Client) sign(req *Request) error {

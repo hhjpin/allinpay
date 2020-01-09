@@ -31,3 +31,13 @@ func (p *Pay) RequestAndCheckStatus(service, method string, param map[string]int
 func (p *Pay) GetConfig() *Config {
 	return p.config
 }
+
+func (p *Pay) GetClient() *Client {
+	return p.client
+}
+
+func (p *Pay) GetRequestParam(service, method string, param map[string]interface{}) (string, error) {
+	req := NewRequest(p.config)
+	req.SetReq(service, method, param)
+	return p.client.CreateUriParam(req)
+}

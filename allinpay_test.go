@@ -77,3 +77,14 @@ func TestMemberServiceSetRealName(t *testing.T) {
 	})
 	t.Log(resp, err)
 }
+
+func TestMemberSignContract(t *testing.T) {
+	pay := NewPay()
+	uri, err := pay.GetRequestParam("MemberService", "signContract", map[string]interface{}{
+		"bizUserId": "test_user_66",
+		"jumpUrl":   "https://test.com/api/v1/mp/cart/allinpay/fronturl",
+		"backUrl":   "https://test.com/api/v1/mp/cart/allinpay/backurl",
+		"source":    1,
+	})
+	t.Log(uri, err)
+}
