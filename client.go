@@ -28,6 +28,9 @@ func (c *Client) Get(req *Request) (*Response, error) {
 	if err := json.Unmarshal(body, &resp); err != nil {
 		return nil, err
 	}
+	if resp.Status != "OK" {
+		return &resp, nil
+	}
 	if err := c.verify(req, &resp); err != nil {
 		return nil, err
 	}
